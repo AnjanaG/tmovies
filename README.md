@@ -1,164 +1,94 @@
-<div align="center" >
-  <br/>
-  <br/>
-  <img src="/public/logo-dark.png#gh-dark-mode-only" alt="logo" width="200" height="auto" />
-  <img src="/public/logo-light.png#gh-light-mode-only" alt="logo" width="200" height="auto" />
-  <br/>
-  <br/>
+# tmovies
 
-  <p >
-tMovies is a simple movie application built with React JS, Typescript, and Tailwind CSS, <br/> which allows users to search and view the trailer of both movies and TV series.
-  </p>
+Movie catalog app extended with AI agents modeling content ops capabilities — launch workflow analyzer, [future: metadata enrichment, localization QA].
 
-<p>
-  <a href="https://github.com/sudeepmahato16/movie-app/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/sudeepmahato16/movie-app" alt="contributors" />
-  </a>
-  <a href="">
-    <img src="https://img.shields.io/github/last-commit/sudeepmahato16/movie-app" alt="last update" />
-  </a>
-  <a href="https://github.com/sudeepmahato16/movie-app/network/members">
-    <img src="https://img.shields.io/github/forks/sudeepmahato16/movie-app" alt="forks" />
-  </a>
-  <a href="https://github.com/sudeepmahato16/movie-app/stargazers">
-    <img src="https://img.shields.io/github/stars/sudeepmahato16/movie-app" alt="stars" />
-  </a>
-  <a href="https://github.com/sudeepmahato16/movie-app/issues/">
-    <img src="https://img.shields.io/github/issues/sudeepmahato16/movie-app" alt="open issues" />
-  </a>
-  <a href="https://github.com/sudeepmahato16/movie-app/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/sudeepmahato16/movie-app.svg" alt="license" />
-  </a>
-</p>
-   
-<h4>
-    <a href="https://tmovies-blush.vercel.app/">View Demo</a>
-  <span> · </span>
-    <a href="https://github.com/sudeepmahato16/movie-app/blob/main/README.md">Documentation</a>
-  <span> · </span>
-    <a href="https://github.com/sudeepmahato16/movie-app/issues/">Report Bug</a>
-  <span> · </span>
-    <a href="https://github.com/sudeepmahato16/movie-app/issues/">Request Feature</a>
-  </h4>
-</div>
+Built with React, TypeScript, and Tailwind CSS. Uses the TMDB API for catalog data and the Anthropic API for AI features.
 
-<br/>
-<br/>
+[Live demo](https://tmovies-blush.vercel.app)
+
+---
 
 ## Features
 
-1. **Search Movies and TV Series:**
+**Catalog** — Search and browse movies and TV series. View trailers, cast details, and metadata.
 
-   1. Users can easily search for their favorite movies and TV series within the application.
-   2. View trailers to get a sneak peek before watching.
+**Launch Process Analyzer** — Paste any multi-step content launch workflow. The analyzer classifies each step into an automation tier, explains its reasoning, flags misclassification risk, and outputs a sequenced transformation roadmap.
 
-2. **Detailed Movie Information:**
+---
 
-   1. Access comprehensive information about a selected movie, including details about the cast, crew, and more.
+## The PM thinking behind this
 
-<br/>
+Content operations at a streaming company involves hundreds of workflow steps per title, per market. The question is never "can we automate this?" — it's "which steps should we automate, in what order, and where does automation create unacceptable risk?"
 
-## :camera: Screenshots
+The Launch Process Analyzer models that decision framework explicitly. Each step is classified into one of four tiers:
 
-<kbd><img width="952" alt="hero" src="https://github.com/sudeepmahato16/movie-app/assets/122378993/195e2334-4790-4d0c-85e6-7a03ca1981ee"></kbd>
+**Full Automation** — Repetitive, rule-based, low-stakes, high-volume. No human needs to see this. Examples: metadata ingestion, CDN propagation confirmation, availability window configuration.
 
-<kbd><img width="950" alt="youtube video" src="https://user-images.githubusercontent.com/122378993/218236507-d55ca04d-2d6c-414b-9316-3817ae1a6cd7.png"></kbd>
+**Human-in-Loop** — The agent does the work, but a human approves before any action is taken. The efficiency gain comes from reducing the cognitive load on the human, not removing them. Examples: push notification copy review, thumbnail selection assistance.
 
-<kbd><img width="953" alt="movie" src="https://user-images.githubusercontent.com/122378993/218257506-40efd922-0525-4620-81f4-eb03cdc661c8.png"></kbd>
+**Human Decides, Agent Executes** — Judgment stays human (editorial, risk, strategy), but once a decision is made, the execution can be automated. This is often the highest-leverage tier because it preserves human accountability while eliminating manual execution overhead. Examples: go/no-go for a launch date, territory availability decisions.
 
-<kbd><img width="953" alt="catalog" src="https://github.com/sudeepmahato16/movie-app/assets/122378993/d185a488-bb66-4890-a8af-a73b4e0941b5"></kbd>
+**Fully Human** — Creative judgment, editorial discretion, stakeholder politics, exception handling. Automating these steps degrades quality or creates compliance risk. Examples: thumbnail selection for a flagship title in a new market, executive summary to senior leadership.
 
-<br/>
-<br/>
+The roadmap output sequences automation by impact x feasibility, with explicit dependencies. This mirrors how a senior PM would actually prioritize a workflow transformation initiative — not by what's technically easiest, but by what unlocks the most downstream value.
 
-## Getting Started
+---
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+## Architecture
 
-\***\* Prerequisites \*\***
+The analyzer routes through a Vercel serverless function (`/api/analyze-launch.ts`) that proxies to the Anthropic API. The API key stays server-side. The React frontend calls `/api/analyze-launch` and renders structured JSON results.
 
-- git
-  If you want to clone the project from GitHub and work with it locally, you will need to have Git installed on your system. You can download and install Git from the official website (**[https://git-scm.com/](https://git-scm.com/)**).
-- Node.js
-  Application requires Node.js to be installed on your system in order to run. You can download and install the latest version of Node.js from the official website (**[https://nodejs.org/](https://nodejs.org/)**).
-- npm (Node Package Manager)
-  npm is the package manager for Node.js, and is used to manage the dependencies and packages required for your Next.js project. It is installed automatically when you install Node.js.
-  To check if npm is installed on your system, you can open a terminal or command prompt and enter the following command:
-  ```bash
-  npm -v
-  ```
+```
+User input (workflow steps)
+       ↓
+React page (/launch-analyzer)
+       ↓
+POST /api/analyze-launch (Vercel serverless)
+       ↓
+Anthropic API (claude-sonnet-4-20250514)
+       ↓
+Structured JSON: step classifications + roadmap
+       ↓
+Step cards + distribution bar + phase roadmap
+```
 
-Once you have these prerequisites in place, you can proceed to clone the project from GitHub using Git.
+---
 
-<br/>
+## Local setup
 
-\***\* Installing \*\***
+```bash
+git clone https://github.com/AnjanaG/tmovies.git
+cd tmovies
+npm install
+```
 
-Make sure you have all the necessary prerequisites installed on your system. Follow the below steps to install the setup the project on your machine:
+Create a `.env` file at root:
 
-- Open a terminal or command prompt and navigate to the directory where you want to clone the project.
-- Run the following command to clone the project from GitHub:
-  ```bash
-  git clone https://github.com/sudeepmahato16/movie-app.git
-  ```
-- This will create a new directory called "movie-app" in the current location, containing the code for the movie app project.
-- Navigate to the project directory by running the following command:
+```bash
+VITE_API_KEY=<your-tmdb-api-key>
+VITE_TMDB_API_BASE_URL=https://api.themoviedb.org/3
+ANTHROPIC_API_KEY=<your-anthropic-api-key>
+```
 
-  ```bash
-  cd movie-app
-  ```
+Run locally with Vercel CLI (needed for the serverless function):
 
-- Run the following command to install the project's dependencies using npm:
+```bash
+npm install -g vercel
+vercel dev
+```
 
-  ```bash
-  npm install
-  ```
+Or run without the AI feature:
 
-- Start the server
+```bash
+npm run dev
+```
 
-  ```bash
-  npm run dev
-  ```
+Get a TMDB API key at [themoviedb.org](https://www.themoviedb.org/settings/api).
+Get an Anthropic API key at [console.anthropic.com](https://console.anthropic.com).
 
-- To use the movie project, you will need to set up some environment variables on your development machine. Here are the steps to follow:
+---
 
-  1. Create a **`.env`** file in the root of the project.
-  2. Add the following variables to the **`.env`** file, replacing the placeholder values with your own:
+## What's next
 
-  ```jsx
-  VITE_API_KEY=<your-tmdb-api-key>
-  VITE_TMDB_API_BASE_URL = https://api.themoviedb.org/3
-  ```
-
-  3. Save the **`.env`** file.
-
-- Once the dependencies are installed, you can run the project locally by running the following command:
-  ```bash
-  npm run dev
-  ```
-
-This will start the development server and open the movie application in your default web browser.
-
-<br/>
-
-## Contributing
-
-We welcome contributions to movie app! If you have an idea for a new feature, an improvement to an existing feature, or a bug fix, please open an issue to discuss it before submitting a pull request. This helps me to review and understand your changes more efficiently.
-
-To contribute code to movie app project:
-
-1. Fork the repository
-2. Create a new branch for your feature or bug fix
-3. Commit your changes to the new branch
-4. Run the automated tests to ensure that your changes do not break any existing functionality
-5. Open a pull request back to the main repository, including a description of your changes and any relevant issue numbers
-
-Thank you for your contribution to Movie app project! We appreciate your efforts to help make this a great movie application.
-
-<br/>
-
-## Credits
-
-UI/UX design adapted from Tuat Tran Anh's tutorial.
-
-- Tutorial: [Responsive React Movies App With API | ReactJS Movies | ReactJS Tutorial](https://youtu.be/ntYXj9W1Ez8?si=ddwD3FZ6sot_NX9K)
+- Metadata enrichment agent — given a title ID, auto-populate genres, content warnings, and audience ratings from multiple sources with a human review step before write-back
+- Localization QA agent — check subtitle timing, tone consistency, and character limits across languages, flagging issues for human review rather than auto-correcting

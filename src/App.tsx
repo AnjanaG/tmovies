@@ -24,6 +24,7 @@ const Catalog = lazy(() => import("./pages/Catalog"));
 const Home = lazy(() => import("./pages/Home"));
 const Detail = lazy(() => import("./pages/Detail"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const LaunchAnalyzer = lazy(() => import("./pages/LaunchAnalyzer"));
 
 const App = () => {
   useEffect(() => {
@@ -42,6 +43,7 @@ const App = () => {
           <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/launch-analyzer" element={<LaunchAnalyzer />} />
               <Route path="/:category/:id" element={<Detail />} />
               <Route path="/:category" element={<Catalog />} />
               <Route path="*" element={<NotFound />} />
